@@ -48,7 +48,10 @@ module CassandraObject
         @reversed       = options[:reversed]
       end
       
-      def find(attribute_value, options = {})
+      def find(*args)
+        options = args.extract_options!
+        attribute_value = args.join(":")
+        
         cursor = CassandraObject::Cursor.new(@model_class, column_family, attribute_value.to_s, @attribute_name.to_s, :start_after=>options[:start_after], :reversed=>@reversed)
         cursor.validator do |object|
           object.send(@attribute_name) == attribute_value
@@ -86,39 +89,43 @@ module CassandraObject
         end
       end
       
-      def index(attribute_name, options = {})
+      def index(attribute_names, options = {})
         self.indexes ||= {}.with_indifferent_access
-        if options.delete(:unique)
-          self.indexes[attribute_name] = UniqueIndex.new(attribute_name, self, options)
+        
+        attribute_names = Array(attribute_names)
+        index_name = attribute_names.join("_")
+        
+        if options.delete(:unique)          
+          self.indexes[index_name] = UniqueIndex.new(index_name, self, options)
           class_eval <<-eom
-            def self.find_by_#{attribute_name}(value)
-              indexes[:#{attribute_name}].find(value)
+            def self.find_by_#{attribute_names.join("_and_")}(value)
+              indexes[:#{index_name}].find(value)
             end
             
             after_save do |record|
-              self.indexes[:#{attribute_name}].write(record)
+              self.indexes[:#{index_name}].write(record)
               true
             end
               
             after_destroy do |record|
-              record.class.indexes[:#{attribute_name}].remove(record)
+              record.class.indexes[:#{index_name}].remove(record)
               true
             end
           eom
         else
-          self.indexes[attribute_name] = Index.new(attribute_name, self, options)
+          self.indexes[index_name] = Index.new(index_name, self, options)
           class_eval <<-eom
-            def self.find_all_by_#{attribute_name}(value, options = {})
-              self.indexes[:#{attribute_name}].find(value, options)
+            def self.find_all_by_#{attribute_names.join("_and_")}(*args)
+              self.indexes[:#{index_name}].find(*args)
             end
             
             after_save do |record|
-              record.class.indexes[:#{attribute_name}].write(record)
+              record.class.indexes[:#{index_name}].write(record)
               true
             end
               
             after_destroy do |record|
-              record.class.indexes[:#{attribute_name}].remove(record)
+              record.class.indexes[:#{index_name}].remove(record)
               true
             end
           eom
