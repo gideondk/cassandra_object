@@ -46,14 +46,14 @@ module CassandraObject
         @attribute_names = attribute_names
         @model_class     = model_class
         @reversed        = options[:reversed]
-        @separator       = ":"
+        @separator       = "_"
       end
       
       def attribute_name
         @attribute_names.join(@separator).to_s
       end
       
-      def record_attributes
+      def attributes_for(record)
         @attribute_names.each do |attribute|
           record.send(attribute).to_s
         end.join(@separator)
@@ -71,14 +71,14 @@ module CassandraObject
       end
       
       def write(record)
-        @model_class.connection.insert(column_family, record_attributes, {attribute_name=>{new_key=>record.key.to_s}})
+        @model_class.connection.insert(column_family, attributes_for(record), {attribute_name=>{new_key=>record.key.to_s}})
       end
       
       def remove(record)
       end
       
       def column_family
-        @model_class.column_family + "By" + @attribute_names.join("_").camelize 
+        @model_class.column_family + "By" + attribute_name.camelize 
       end
       
       def new_key
@@ -124,7 +124,7 @@ module CassandraObject
             end
           eom
         else
-          self.indexes[index_name] = Index.new(index_name, self, options)
+          self.indexes[index_name] = Index.new(attribute_names, self, options)
           class_eval <<-eom
             def self.find_all_by_#{attribute_names.join("_and_")}(*args)
               self.indexes[:#{index_name}].find(*args)
