@@ -42,32 +42,43 @@ module CassandraObject
     end
     
     class Index
-      def initialize(attribute_name, model_class, options)
-        @attribute_name = attribute_name
-        @model_class    = model_class
-        @reversed       = options[:reversed]
+      def initialize(attribute_names, model_class, options)
+        @attribute_names = attribute_names
+        @model_class     = model_class
+        @reversed        = options[:reversed]
+        @separator       = ":"
+      end
+      
+      def attribute_name
+        @attribute_names.join(@separator).to_s
+      end
+      
+      def record_attributes
+        @attribute_names.each do |attribute|
+          record.send(attribute).to_s
+        end.join(@separator)
       end
       
       def find(*args)
         options = args.extract_options!
-        attribute_value = args.join(":")
+        attribute_value = args.join(@separator).to_s
         
-        cursor = CassandraObject::Cursor.new(@model_class, column_family, attribute_value.to_s, @attribute_name.to_s, :start_after=>options[:start_after], :reversed=>@reversed)
+        cursor = CassandraObject::Cursor.new(@model_class, column_family, attribute_value, attribute_name, :start_after=>options[:start_after], :reversed=>@reversed)
         cursor.validator do |object|
-          object.send(@attribute_name) == attribute_value
+          object.send(attribute_name) == attribute_value
         end
         cursor.find(options[:limit] || 100)
       end
       
       def write(record)
-        @model_class.connection.insert(column_family, record.send(@attribute_name).to_s, {@attribute_name.to_s=>{new_key=>record.key.to_s}})
+        @model_class.connection.insert(column_family, record_attributes, {attribute_name=>{new_key=>record.key.to_s}})
       end
       
       def remove(record)
       end
       
       def column_family
-        @model_class.column_family + "By" + @attribute_name.to_s.camelize 
+        @model_class.column_family + "By" + @attribute_names.join("_").camelize 
       end
       
       def new_key
