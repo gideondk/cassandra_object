@@ -39,7 +39,7 @@ module CassandraObject
       end
 
       def multi_get(keys, options = {})
-        return [] if keys.empty?
+        return ActiveSupport::OrderedHash.new if keys.empty?
         
         options = {:consistency => self.read_consistency, :limit => 100}.merge(options)
         unless valid_read_consistency_level?(options[:consistency])

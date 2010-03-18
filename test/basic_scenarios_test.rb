@@ -71,7 +71,7 @@ class BasicScenariosTest < CassandraObjectTestCase
   end
   
   test "multiget with empty keys array" do
-    assert_equal Customer.multi_get([]), []
+    assert_equal Customer.multi_get([]).count, 0
   end
 
   test "creating a new record starts with the right version" do
