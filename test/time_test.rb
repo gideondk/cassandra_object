@@ -5,6 +5,7 @@ class TimeTest < CassandraObjectTestCase
   test "new raises an error" do
     begin
       appt = Appointment.new :start_time => 1
+      appt.save
       flunk "Should have failed to save"
     rescue ArgumentError => e
       assert_equal "CassandraObject::TimeType requires a Time", e.message
@@ -15,6 +16,7 @@ class TimeTest < CassandraObjectTestCase
     begin
       appt = Appointment.new
       appt.start_time = 1
+      appt.save
       flunk "Should have failed to save"
     rescue ArgumentError => e
       assert_equal "CassandraObject::TimeType requires a Time", e.message

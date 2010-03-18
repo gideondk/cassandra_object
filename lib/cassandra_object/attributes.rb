@@ -59,7 +59,7 @@ module CassandraObject
     module InstanceMethods
       def write_attribute(name, value)
         if ma = self.class.model_attributes[name]
-          @attributes[name.to_s] = ma.check_value!(value)
+          @attributes[name.to_s] = value
         else
           raise NoMethodError, "Unknown attribute #{name.inspect}"
         end

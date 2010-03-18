@@ -35,6 +35,7 @@ class BasicScenariosTest < CassandraObjectTestCase
   test "should not let you assign junk to a date column" do
     assert_raise(ArgumentError) do
       @customer.date_of_birth = 24.5
+      @customer.save
     end
   end
 
@@ -55,6 +56,7 @@ class BasicScenariosTest < CassandraObjectTestCase
   test "should validate strings passed to a typed column" do
     assert_raises(ArgumentError){
       @customer.date_of_birth = "35345908"
+      @customer.save
     }
   end
 

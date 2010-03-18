@@ -170,7 +170,11 @@ module CassandraObject
       end
       
       def _write
-        changed_attributes = changed.inject({}) { |h, n| h[n] = read_attribute(n); h }
+        changed_attributes = changed.inject({}) { |h, n| 
+          ma = self.class.model_attributes[n]
+          h[n] = ma.check_value!(read_attribute(n))
+          h 
+        }
         self.class.write(key, changed_attributes, schema_version)
       end
 
