@@ -51,10 +51,12 @@
         <ColumnFamily CompareWith="UTF8Type" Name="Customers" />
         <ColumnFamily CompareWith="UTF8Type" CompareSubcolumnsWith="TimeUUIDType" ColumnType="Super" Name="CustomerRelationships" />
         <ColumnFamily CompareWith="UTF8Type" CompareSubcolumnsWith="TimeUUIDType" ColumnType="Super" Name="CustomersByLastName" />
+        <ColumnFamily CompareWith="UTF8Type" CompareSubcolumnsWith="TimeUUIDType" ColumnType="Super" Name="CustomersByFirstNameLastName" />
         <ColumnFamily CompareWith="UTF8Type" Name="Invoices" />
         <ColumnFamily CompareWith="UTF8Type" CompareSubcolumnsWith="TimeUUIDType" ColumnType="Super" Name="InvoiceRelationships" />
         <ColumnFamily CompareWith="UTF8Type" Name="InvoicesByNumber" />
         <ColumnFamily CompareWith="UTF8Type" Name="Payments" />
+        <ColumnFamily CompareWith="UTF8Type" Name="Appointments" />
       </Keyspace>
     </Keyspaces>
 
@@ -197,7 +199,8 @@
          odds of losing data from a failure after writing the log
          entry but before it actually reaches the disk.
     -->
-    <CommitLogSync>false</CommitLogSync>
+    <CommitLogSync>periodic</CommitLogSync>
+    <CommitLogSyncPeriodInMS>100000</CommitLogSyncPeriodInMS>
     <!-- Delay (in microseconds) during which additional commit log
          entries may be written before fsync.  This will increase
          latency slightly, but can vastly improve throughput where

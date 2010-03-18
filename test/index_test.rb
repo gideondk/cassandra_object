@@ -1,4 +1,4 @@
-require 'test_helper'
+require File.join(File.dirname(__FILE__), 'test_helper')
 
 class IndexTest < CassandraObjectTestCase
   context "A non-unique index" do
@@ -22,6 +22,10 @@ class IndexTest < CassandraObjectTestCase
       @wife.save
       assert_equal [@koz.key], Customer.find_all_by_last_name(@last_name).map(&:key)
     end
+    
+    # should "support multi-field indices" do
+    #   assert_equal [@koz.key], Customer.find_all_by_first_name_and_last_name("Michael", @last_name).map(&:key)
+    # end
   end
 
   context "A corrupt non-unique index" do
