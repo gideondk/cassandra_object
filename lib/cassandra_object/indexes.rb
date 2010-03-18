@@ -54,7 +54,7 @@ module CassandraObject
       end
       
       def attributes_for(record)
-        @attribute_names.each do |attribute|
+        @attribute_names.map do |attribute|
           record.send(attribute).to_s
         end.join(@separator)
       end
@@ -65,7 +65,9 @@ module CassandraObject
         
         cursor = CassandraObject::Cursor.new(@model_class, column_family, attribute_value, attribute_name, :start_after=>options[:start_after], :reversed=>@reversed)
         cursor.validator do |object|
-          object.send(attribute_name) == attribute_value
+          @attribute_names.zip(args).all? do |attribute, value|
+            object.send(attribute) == value
+          end
         end
         cursor.find(options[:limit] || 100)
       end
