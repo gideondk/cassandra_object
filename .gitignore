@@ -1,4 +1,5 @@
 pkg
+*.gem
 .yardoc
 doc/
 bin/*
