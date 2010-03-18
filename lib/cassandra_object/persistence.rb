@@ -39,6 +39,8 @@ module CassandraObject
       end
 
       def multi_get(keys, options = {})
+        return [] if keys.empty?
+        
         options = {:consistency => self.read_consistency, :limit => 100}.merge(options)
         unless valid_read_consistency_level?(options[:consistency])
           raise ArgumentError, "Invalid read consistency level: '#{options[:consistency]}'. Valid options are [:quorum, :one]"

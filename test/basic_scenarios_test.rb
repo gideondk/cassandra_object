@@ -69,6 +69,10 @@ class BasicScenariosTest < CassandraObjectTestCase
     assert_equal @customer, customer
     assert_nil nothing
   end
+  
+  test "multiget with empty keys array" do
+    assert_equal Customer.multi_get([]), []
+  end
 
   test "creating a new record starts with the right version" do
     @invoice  = mock_invoice
