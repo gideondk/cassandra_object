@@ -53,6 +53,7 @@ class Invoice < CassandraObject::Base
   attribute :gst_number, :type=>:string
 
   index :number, :unique=>true
+  index [:number, :gst_number], :unique => true
 
   association :customer, :unique=>true, :inverse_of=>:invoices
 

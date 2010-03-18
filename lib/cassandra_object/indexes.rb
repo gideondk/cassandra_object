@@ -7,33 +7,46 @@ module CassandraObject
     end
     
     class UniqueIndex
-      def initialize(attribute_name, model_class, options)
-        @attribute_name = attribute_name
-        @model_class    = model_class
+      def initialize(attribute_names, model_class, options)
+        @attribute_names = attribute_names
+        @model_class     = model_class
+        @separator       = "_"
       end
       
-      def find(attribute_value)
+      def attribute_name
+        @attribute_names.join(@separator).to_s
+      end
+      
+      def attributes_for(record)
+        @attribute_names.map do |attribute|
+          record.send(attribute).to_s
+        end.join(@separator)
+      end
+      
+      def find(*args)
+        attribute_value = args.join(@separator).to_s
+
         # first find the key value
-        key = @model_class.connection.get(column_family, attribute_value.to_s, 'key')
+        key = @model_class.connection.get(column_family, attribute_value, 'key')
         # then pass to get
         if key
           @model_class.get(key.to_s)
         else
-          @model_class.connection.remove(column_family, attribute_value.to_s)
+          @model_class.connection.remove(column_family, attribute_value)
           nil
         end
       end
       
       def write(record)
-        @model_class.connection.insert(column_family, record.send(@attribute_name).to_s, {'key'=>record.key.to_s})
+        @model_class.connection.insert(column_family, attributes_for(record), {'key'=>record.key.to_s})
       end
       
       def remove(record)
-        @model_class.connection.remove(column_family, record.send(@attribute_name).to_s)
+        @model_class.connection.remove(column_family, attributes_for(record))
       end
       
       def column_family
-        @model_class.column_family + "By" + @attribute_name.to_s.camelize 
+        @model_class.column_family + "By" + attribute_name.camelize 
       end
       
       def column_family_configuration
@@ -109,10 +122,10 @@ module CassandraObject
         index_name = attribute_names.join("_")
         
         if options.delete(:unique)          
-          self.indexes[index_name] = UniqueIndex.new(index_name, self, options)
+          self.indexes[index_name] = UniqueIndex.new(attribute_names, self, options)
           class_eval <<-eom
-            def self.find_by_#{attribute_names.join("_and_")}(value)
-              indexes[:#{index_name}].find(value)
+            def self.find_by_#{attribute_names.join("_and_")}(*args)
+              indexes[:#{index_name}].find(*args)
             end
             
             after_save do |record|

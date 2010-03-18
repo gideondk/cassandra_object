@@ -57,6 +57,13 @@ class IndexTest < CassandraObjectTestCase
       @invoice.destroy
       assert_nil Invoice.find_by_number(@number)
     end
+    
+    should "support multi-field indices" do
+      gst = "66-666-666"
+      @gst_invoice = Invoice.create :number=>Time.now.to_i*(rand(5)), :total=>Time.now.to_f, :gst_number => gst
+      
+      assert_equal @gst_invoice, Invoice.find_by_number_and_gst_number(@gst_invoice.number, @gst_invoice.gst_number)
+    end
   end
   
   context " A corrupt unique index" do
