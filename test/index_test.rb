@@ -23,9 +23,9 @@ class IndexTest < CassandraObjectTestCase
       assert_equal [@koz.key], Customer.find_all_by_last_name(@last_name).map(&:key)
     end
     
-    # should "support multi-field indices" do
-    #   assert_equal [@koz.key], Customer.find_all_by_first_name_and_last_name("Michael", @last_name).map(&:key)
-    # end
+    should "support multi-field indices" do
+      assert_equal [@koz.key], Customer.find_all_by_first_name_and_last_name("Michael", @last_name).map(&:key)
+    end
   end
 
   context "A corrupt non-unique index" do
