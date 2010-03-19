@@ -7,6 +7,7 @@ module CassandraObject
     
     included do
       class_inheritable_hash :associations
+      after_create :persist_associations
     end
 
     module ClassMethods
@@ -29,6 +30,17 @@ module CassandraObject
           raise e unless e.message =~ /Invalid column family/
         end
         super
+      end
+    end
+    
+    module InstanceMethods
+      def persist_associations
+        return true if self.class.associations.nil? || self.class.associations.empty?
+        
+        self.class.associations.each do |name, association|
+          associated_object = self.instance_variable_get("@_#{name}".to_sym)
+          association.set(self, associated_object) if associated_object
+        end
       end
     end
   end

@@ -22,6 +22,9 @@ module CassandraObject
       end
     end
     
+    def set(*args)
+    end
+    
     def new_key
       Cassandra::UUID.new
     end

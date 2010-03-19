@@ -17,7 +17,6 @@ module CassandraObject
         
         def #{@association_name}=(record)
           @_#{@association_name} = record
-          self.class.associations[:#{@association_name}].set(self, record)
         end
       eos
     end
