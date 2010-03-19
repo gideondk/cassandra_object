@@ -31,8 +31,14 @@ class BasicScenariosTest < CassandraObjectTestCase
   test "date_of_birth is a date" do
     assert @customer.date_of_birth.is_a?(Date)
   end
+  
+  test "should not raise an error when assigning data of an invalid type" do
+    assert_nothing_raised(ArgumentError) do
+      @customer.date_of_birth = 24.5
+    end
+  end
 
-  test "should not let you assign junk to a date column" do
+  test "should raise an error when attempting to persist data of an invalid type" do
     assert_raise(ArgumentError) do
       @customer.date_of_birth = 24.5
       @customer.save

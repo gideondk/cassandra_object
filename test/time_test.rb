@@ -12,7 +12,14 @@ class TimeTest < CassandraObjectTestCase
     end
   end
 
-  test "the attribute writer raises an error" do
+  test "the attribute writer does not raise an error when assigning an invalid data type" do
+    assert_nothing_raised(ArgumentError) do
+      appt = Appointment.new
+      appt.start_time = 1
+    end
+  end
+
+  test "the attribute writer raises an error when persisting an invalid data type" do
     begin
       appt = Appointment.new
       appt.start_time = 1
