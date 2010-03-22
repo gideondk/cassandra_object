@@ -60,6 +60,11 @@ There isn't much in the way of documentation yet, but a few examples.
         
 # FAQ
 
+## How does this fork differ from the original?
+
+- 0.6 isn't fully supported, I'll try to fix that! :-)
+- Going to add some additional documentation...
+
 ## How do I make this work?
 
 Here are some basic directions:
