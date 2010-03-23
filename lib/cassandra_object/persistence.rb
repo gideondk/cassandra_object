@@ -63,7 +63,7 @@ module CassandraObject
       end
 
       def all(keyrange = ''..'', options = {})
-        connection.get_range(column_family, :start => keyrange.first, :finish => keyrange.last, :count=>(options[:limit] || 100)).map {|column| get(column.key) }
+        connection.get_range(column_family, :start => keyrange.first, :finish => keyrange.last, :count=>(options[:limit] || 100)).map {|column| get(column.key) }.compact
       end
 
       def first(keyrange = ''..'', options = {})
