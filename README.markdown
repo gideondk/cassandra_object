@@ -21,7 +21,7 @@ There isn't much in the way of documentation yet, but a few examples.
   
           index :date_of_birth
   
-          association :invoices, :unique=>false, :inverse_of=>:customer
+          association :invoices, :unique=>false, :inverse_of=>:customer, :reversed=>true
 
           private
   
