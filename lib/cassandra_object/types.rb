@@ -97,6 +97,19 @@ module CassandraObject
     module_function :decode
   end
 
+  module BinaryType
+    def encode(array)
+      raise ArgumentError.new("#{self} requires a Array") unless array.kind_of?(Array)
+      array
+    end
+    module_function :encode
+
+    def decode(array)
+      array
+    end
+    module_function :decode
+  end
+  
   module HashType
     def encode(hash)
       raise ArgumentError.new("#{self} requires a Hash") unless hash.kind_of?(Hash)
