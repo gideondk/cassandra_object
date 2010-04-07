@@ -100,12 +100,12 @@ module CassandraObject
   module BinaryType
     def encode(array)
       raise ArgumentError.new("#{self} requires a Array") unless array.kind_of?(Array)
-      array
+      array.to_s
     end
     module_function :encode
 
     def decode(array)
-      array
+      array.to_a
     end
     module_function :decode
   end
